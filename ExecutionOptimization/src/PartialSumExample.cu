@@ -56,12 +56,12 @@ __global__ void sumReduction(int* data, int length){
 		//half the number of active threads at any time, compute the current partial sum
 		for( unsigned int stride = 1; stride < blockDim.x; stride *= 2){
 			__syncthreads();
-			if(tid%(2*stride==0)){
+			if(tid%(2*stride)==0){
 				partialSum[tid]+=partialSum[tid+stride];
 			}
 		}
 		//return the last computed partial sum
-		result = partialSum[0];
+		//result = partialSum[0];
 		return;
 	}
 	else{ 	//these threads are idle, thread id is outside the array bounds
@@ -69,45 +69,69 @@ __global__ void sumReduction(int* data, int length){
 	}
 }
 
-/**
- * Wrapper function to initialize host data elements so that the example appears simpler.
- */
-void ps_setupData(int* arrData, int arrData_length){
-	arrData =  (int*) malloc(ARR_SIZE*sizeof(int));
-	srand(time(NULL));
-	for(int i = 0; i < arrData_length; i++){
-		arrData[i] = rand();
-	}
+__global__ void improved_sumReduction(int* data, int length){
+	const unsigned int tid = threadIdx.x;
+		if(tid < length){
+			//allocate shared memory within the block for the partial sums
+			__shared__ float partialSum[ARR_SIZE];
+			//half the number of active threads at any time, compute the current partial sum
+			for( unsigned int stride = blockDim.x>>1; stride >0 ; stride >>=1){
+				__syncthreads();
+				if(tid < stride){
+					partialSum[tid]+=partialSum[tid+stride];
+				}
+			}
+			//return the last computed partial sum
+
+		}
+		else{ 	//these threads are idle, thread id is outside the array bounds
+		}
+		__syncthreads();
+		//if(tid==0)result = partialSum[0];
+		return;
 }
-/**
- * wrapper function to initialize device element pointers so that the example appears simpler
- */
-void ps_setupDeviceData(int* arrData, int arrData_length, int* arrData_Local,int* psResult){
-	//allocate arrData pointer on device
-	CUDA_CHECK_RETURN(cudaMalloc((void**) &arrData, arrData_length*sizeof(int)));
-	//copy local generated data to the device
-	CUDA_CHECK_RETURN(cudaMemcpy((void*)arrData, arrData_Local, arrData_length*sizeof(int), cudaMemcpyHostToDevice));
-	//allocate the array of size 1 for return value
-	CUDA_CHECK_RETURN(cudaMalloc((void**) &psResult, 1*sizeof(int)));
-	//CUDA_CHECK_RETURN();
-}
+
+
+
 
 
 
 /**
  * Host function that prepares data array and passes it to the CUDA kernel.
  */
-int partialSum(void) {
+int partialSum(bool improved) {
 	int *randomData, *randomData_Device, *psResult_Device;
-	ps_setupData(randomData, ARR_SIZE);
-	ps_setupDeviceData(randomData_Device, ARR_SIZE,randomData, psResult_Device);
+	//generate random data
+	randomData =  (int*) malloc(ARR_SIZE*sizeof(int));
+	srand(time(NULL));
+	for(int i = 0; i < ARR_SIZE; i++){
+		randomData[i] = (int)(((float)rand()/RAND_MAX)*100);
+	}
+	//initialize device pointers
+	//allocate arrData pointer on device
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &randomData_Device, ARR_SIZE*sizeof(int)));
+	//copy local generated data to the device
+	CUDA_CHECK_RETURN(cudaMemcpy((void*)randomData_Device, randomData, ARR_SIZE*sizeof(int), cudaMemcpyHostToDevice));
+	//allocate the array of size 1 for return value
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &psResult_Device, 1*sizeof(int)));
 
 	SET_DEVICE(0);
 	CUDA_CHECK_RETURN(cudaDeviceReset()); //pre-clear the device
 	//launch the kernel
-	sumReduction<<<dim3(1,1,1),dim3(ARR_SIZE,1,1),0,0>>>(randomData_Device, ARR_SIZE);
+	if(!improved){
+		printf("Running naive sum reduction\n");
+		sumReduction<<<dim3(1,1,1),dim3(ARR_SIZE,1,1),0,0>>>(randomData_Device, ARR_SIZE);
+	}
+	else{
+		printf("Running improved sum reduction\n");
+		improved_sumReduction<<<dim3(1,1,1),dim3(ARR_SIZE,1,1),0,0>>>(randomData_Device, ARR_SIZE);
+	}
+
 	CUDA_CHECK_RETURN(cudaDeviceSynchronize());
-//	CUDA_CHECK_RETURN();
+	//Clean up
+	free(randomData);
+	cudaFree(randomData_Device);
+	cudaFree(psResult_Device);
 	CUDA_CHECK_RETURN(cudaDeviceReset()); //clear the device after all work is completed
 	return 0;
 }

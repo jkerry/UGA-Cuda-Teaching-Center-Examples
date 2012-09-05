@@ -8,7 +8,9 @@
 #ifndef PARTIALSUMEXAMPLE_H_
 #define PARTIALSUMEXAMPLE_H_
 
-int partialSum(void);
+int partialSum(bool improved);
+
+
 
 
 #endif /* PARTIALSUMEXAMPLE_H_ */

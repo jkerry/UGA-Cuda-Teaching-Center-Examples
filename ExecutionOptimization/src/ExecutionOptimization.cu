@@ -13,37 +13,6 @@
 #include <time.h>
 #include "PartialSumExample.h"
 
-/**
- * This boolean value defined if debug information is printed within macros
- */
-#define DEBUG true
-/**
- * The number of items in the partial sum array
- */
-#define ARR_SIZE 512
-
-
-/**
- * This macro checks return value of the CUDA runtime call and exits
- * the application if the call failed.
- */
-#define CUDA_CHECK_RETURN(value) {											\
-	cudaError_t _m_cudaStat = value;										\
-	if (_m_cudaStat != cudaSuccess) {										\
-		fprintf(stderr, "Error %s at line %d in file %s\n",					\
-				cudaGetErrorString(_m_cudaStat), __LINE__, __FILE__);		\
-		exit(1);															\
-	} }
-/**
- * This macro changes the active device to the device with the provided integer index.
- */
-#define SET_DEVICE(value) {																\
-	cudaDeviceProp devProp;																\
-	cudaGetDeviceProperties(&devProp, value);											\
-	if(DEBUG)printf("Changing the gpu to device id: %i name: %s\n",value,devProp.name);	\
-	CUDA_CHECK_RETURN(cudaSetDevice(value));											\
-																						\
-}
 
 
 /**
@@ -51,7 +20,10 @@
  */
 int main(void) {
 
-	partialSum();
+	partialSum(false);
+	printf("Finished with naive sum reduction\n");
+	partialSum(true);
+	printf("Finished with improved sum reduction\n");
 
 	return 0;
 }
