@@ -17,19 +17,11 @@ OBJS += \
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/ExecutionOptimization.o: ../src/ExecutionOptimization.cu
+src/%.o: ../src/%.cu
 	@echo 'Building file: $<'
 	@echo 'Invoking: NVCC Compiler'
-	nvcc -G -g -O0 -gencode arch=compute_20,code=sm_20 -odir "src" -M -o "$(@:%.o=%.d)" "$<"
-	nvcc --compile -G -O0 -g -gencode arch=compute_20,code=compute_20 -gencode arch=compute_20,code=sm_20 -o  "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
-src/PartialSumExample.o: ../src/PartialSumExample.cu
-	@echo 'Building file: $<'
-	@echo 'Invoking: NVCC Compiler'
-	nvcc -G -g -O0 -gencode arch=compute_20,code=sm_20 -odir "src" -M -o "$(@:%.o=%.d)" "$<"
-	nvcc --compile -G -O0 -g -gencode arch=compute_20,code=compute_20 -gencode arch=compute_20,code=sm_20 -o  "$@" "$<"
+	nvcc -G -g -O0 -gencode arch=compute_11,code=sm_11 -odir "src" -M -o "$(@:%.o=%.d)" "$<"
+	nvcc --compile -G -O0 -g -gencode arch=compute_11,code=compute_11 -gencode arch=compute_11,code=sm_11  -x cu -o  "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
