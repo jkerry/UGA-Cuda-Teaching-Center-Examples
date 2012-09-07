@@ -54,11 +54,12 @@ __global__ void sumReduction(int* data, int length, int* dev_result){
 	//allocate shared memory within the block for the partial sums
 	__shared__ int partialSum[ARR_SIZE];
 	if(tid < length){
-		partialSum[tid]=0;
+		partialSum[tid]=data[tid];
 		//half the number of active threads at any time, compute the current partial sum
 		for( unsigned int stride = 1; stride < blockDim.x; stride *= 2){
 			__syncthreads();
 			if(tid%(2*stride)==0){
+
 				partialSum[tid]+=partialSum[tid+stride];
 			}
 		}
@@ -76,7 +77,7 @@ __global__ void improved_sumReduction(int* data, int length, int* dev_result){
 	//allocate shared memory within the block for the partial sums
 	__shared__ int partialSum[ARR_SIZE];
 		if(tid < length){
-			partialSum[tid]=0;
+			partialSum[tid]=data[tid];
 			//half the number of active threads at any time, compute the current partial sum
 			for( unsigned int stride = blockDim.x>>1; stride >0 ; stride >>=1){
 				__syncthreads();

@@ -13,18 +13,32 @@
 #include <cuda.h>
 #include <time.h>
 #include "PartialSumExample.h"
+#include "MatrixMultiplicationExample.h"
 
+void testPartialSums(){
+	partialSum(false);
+	printf("Finished with naive sum reduction\n");
+	partialSum(true);
+	printf("Finished with improved sum reduction\n");
+	return;
+}
 
+void testMatrixMultiplication(){
+
+	matrixMultiplication(false);
+	printf("Finished with naive matrix multiplication\n");
+	matrixMultiplication(true);
+	printf("Finished with improved matrix multiplication\n");
+	return;
+}
 
 /**
  * Host function that prepares data array and passes it to the CUDA kernel.
  */
 int main(void) {
 
-	partialSum(false);
-	printf("Finished with naive sum reduction\n");
-	partialSum(true);
-	printf("Finished with improved sum reduction\n");
+	//testPartialSums();
 
+	testMatrixMultiplication();
 	return 0;
 }
