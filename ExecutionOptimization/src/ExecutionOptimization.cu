@@ -15,6 +15,7 @@
 #include "PartialSumExample.h"
 #include "MatrixMultiplicationExample.h"
 #include "ElementSum.h"
+#include "PrecachedElementSum.h"
 
 
 
@@ -44,6 +45,15 @@ void testElementSum(){
 	return;
 }
 
+void testPrecachedElementSum(){
+
+	precachedElementSum(false);
+	printf("Finished with non-cached matrix element sum.\n");
+	precachedElementSum(true);
+	printf("Finished with pre-cached matrix element sum.\n");
+	return;
+}
+
 /**
  * Host function that prepares data array and passes it to the CUDA kernel.
  */
@@ -51,6 +61,7 @@ int main(void) {
 
 	//testPartialSums();
 	//testMatrixMultiplication();
-	testElementSum();
+	//testElementSum();
+	testPrecachedElementSum();
 	return 0;
 }
