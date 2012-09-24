@@ -137,7 +137,7 @@ int partialSum(bool improved) {
 	CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 	int *GPU_Answer, Serial_Answer=0;
 	GPU_Answer = (int*)malloc(sizeof(int));
-	//cudaMemcpyFromSymbol(&answer, "d_answer", sizeof(answer), 0, cudaMemcpyDeviceToHost);
+
 	CUDA_CHECK_RETURN(cudaMemcpy(GPU_Answer, dev_result, sizeof(int), cudaMemcpyDeviceToHost));
 	//compute the serial answer
 

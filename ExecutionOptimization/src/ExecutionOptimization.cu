@@ -14,6 +14,9 @@
 #include <time.h>
 #include "PartialSumExample.h"
 #include "MatrixMultiplicationExample.h"
+#include "ElementSum.h"
+
+
 
 void testPartialSums(){
 	partialSum(false);
@@ -32,13 +35,22 @@ void testMatrixMultiplication(){
 	return;
 }
 
+void testElementSum(){
+
+	elementSum(false);
+	printf("Finished with column sums driven matrix element sum.\n");
+	elementSum(true);
+	printf("Finished with row sums driven matrix element sum.\n");
+	return;
+}
+
 /**
  * Host function that prepares data array and passes it to the CUDA kernel.
  */
 int main(void) {
 
 	//testPartialSums();
-
-	testMatrixMultiplication();
+	//testMatrixMultiplication();
+	testElementSum();
 	return 0;
 }
