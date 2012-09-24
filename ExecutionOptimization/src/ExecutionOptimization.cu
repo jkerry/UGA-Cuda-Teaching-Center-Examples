@@ -38,9 +38,9 @@ void testMatrixMultiplication(){
 void testElementSum(){
 
 	elementSum(false);
-	printf("Finished with column sums driven matrix element sum.\n");
-	elementSum(true);
 	printf("Finished with row sums driven matrix element sum.\n");
+	elementSum(true);
+	printf("Finished with column sums driven matrix element sum.\n");
 	return;
 }
 
